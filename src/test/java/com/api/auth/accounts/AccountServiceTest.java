@@ -1,23 +1,24 @@
 package com.api.auth.accounts;
 
+import com.api.auth.common.BaseControllerTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-class AccountServiceTest {
+
+class AccountServiceTest extends BaseControllerTest {
 
     @Autowired AccountService accountService;
 
-    @Autowired AccountRepository accountRepository;
+    @Autowired PasswordEncoder passwordEncoder;
 
     @Test
     void findByUsername() {
@@ -33,12 +34,12 @@ class AccountServiceTest {
                 .build();
 
         // when
-        this.accountRepository.save(account);
-        UserDetailsService userDetailsService = (UserDetailsService) accountService;
+        this.accountService.saveAccount(account);
+        UserDetailsService userDetailsService = accountService;
         UserDetails userDetails = userDetailsService.loadUserByUsername("jbj112@naver.com");
 
         // then
-        assertThat(userDetails.getPassword()).isEqualTo(password);
+        assertThat(this.passwordEncoder.matches(password, userDetails.getPassword())).isTrue();
     }
 
     @Test
