@@ -13,6 +13,8 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Configuration
 public class AppConfig {
@@ -25,7 +27,7 @@ public class AppConfig {
     PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
-
+/*
     @Bean
     public ApplicationRunner applicationRunner() {
         return new ApplicationRunner() {
@@ -36,10 +38,12 @@ public class AppConfig {
                 Account basicUser = Account.builder()
                         .email("jbj112@naver.com")
                         .password("jbj112")
-                        .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
+                        .roles(Stream.of(AccountRole.ADMIN, AccountRole.USER).collect(Collectors.toSet()))
                         .build();
                 accountService.saveAccount(basicUser);
             }
         };
     }
+ */
+
 }

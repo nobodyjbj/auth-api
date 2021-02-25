@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,10 +28,11 @@ class AuthServerConfigTest extends BaseControllerTest {
         // given
         String username = "jbj112@naver.com";
         String password ="jbj112";
+
         Account account =  Account.builder()
                 .email(username)
                 .password(password)
-                .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
+                .roles(Stream.of(AccountRole.ADMIN, AccountRole.USER).collect(Collectors.toSet()))
                 .build();
         this.accountService.saveAccount(account);
 
@@ -39,7 +40,10 @@ class AuthServerConfigTest extends BaseControllerTest {
         String clientSecret = "pass";
 
         this.mockMvc.perform(post("/oauth/token")
-                .with(httpBasic(clientId, clientSecret)))
+                .with(httpBasic(clientId, clientSecret))
+                .param("username", username)
+                .param("password", password)
+                .param("grant_type", "password"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("access_token").exists());
