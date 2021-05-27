@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @Import(RestDocsConfiguration.class)
 @Ignore
 public class BaseControllerTest {
+    
     @Autowired
     protected MockMvc mockMvc;
 

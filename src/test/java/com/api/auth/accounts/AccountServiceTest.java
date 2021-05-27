@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AccountServiceTest extends BaseControllerTest {
 
     @Autowired AccountService accountService;
-
     @Autowired PasswordEncoder passwordEncoder;
 
     @Test
