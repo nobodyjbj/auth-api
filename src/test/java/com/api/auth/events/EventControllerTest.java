@@ -4,6 +4,7 @@ import com.api.auth.common.BaseControllerTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.annotation.Rollback;
 
 import java.time.LocalDateTime;
 
@@ -16,29 +17,33 @@ public class EventControllerTest extends BaseControllerTest {
     @Test
     void createEvent() throws Exception {
         // given
-        EventDto event = EventDto.builder()
+        EventDto eventDto = EventDto.builder()
                 .name("spring")
                 .description("spring")
                 .beginEnrollmentDateTime(LocalDateTime.of(2020, 06, 07, 12, 12))
                 .closeEnrollmentDateTime(LocalDateTime.of(2020, 06, 07, 12, 12))
                 .beginEventDateTime(LocalDateTime.of(2020, 06, 07, 12, 12))
                 .endEventDateTime(LocalDateTime.of(2020, 06, 07, 12, 12))
+                .location("저 세상 강의실 A1")
                 .basePrice(100)
                 .maxPrice(200)
                 .limitOfEnrollment(100)
-                .location("저 세상 강의실 A1")
                 .build();
         
         // when & then
         mockMvc.perform(post("/api/events/")
                     .contentType(MediaTypes.HAL_JSON_VALUE)
                     .accept(MediaTypes.HAL_JSON_VALUE)
-                    .content(objectMapper.writeValueAsString(event)))
+                    .content(objectMapper.writeValueAsString(eventDto)))
             .andDo(print())
             .andExpect(status().isCreated())
             .andExpect(jsonPath("id").exists())
             .andExpect(header().exists(HttpHeaders.LOCATION))
-            .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE));
+            .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
+            .andExpect(jsonPath("free").value(false))
+            .andExpect(jsonPath("offline").value(true))
+            .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()))
+        ;
     }
     
     @Test
