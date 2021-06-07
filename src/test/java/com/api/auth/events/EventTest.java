@@ -1,7 +1,12 @@
 package com.api.auth.events;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -37,51 +42,45 @@ class EventTest {
         assertThat(event.getDescription()).isEqualTo(description);
     }
     
-    @Test
-    void testFree() {
-        Event event = Event.builder()
-            .basePrice(0)
-            .maxPrice(0)
-            .build();
-        
-        event.update();
-        
-        assertThat(event.isFree()).isTrue();
-    
-        event = Event.builder()
-            .basePrice(100)
-            .maxPrice(0)
-            .build();
-    
-        event.update();
-    
-        assertThat(event.isFree()).isFalse();
-    
-        event = Event.builder()
-            .basePrice(0)
-            .maxPrice(100)
-            .build();
-    
-        event.update();
-    
-        assertThat(event.isFree()).isFalse();
+    private static Stream<Arguments> provideForTestFree() {
+        return Stream.of(
+            Arguments.of(0, 0, true),
+            Arguments.of(100, 0, false),
+            Arguments.of(0, 100, false),
+            Arguments.of(100, 200, false)
+        );
     }
     
-    @Test
-    void testOffline() {
+    @ParameterizedTest
+    @MethodSource(value = "provideForTestFree")
+    void testFree(int basePrice, int maxPrice, boolean isFree) {
         Event event = Event.builder()
-            .location("아무튼 장소가 있어.")
+            .basePrice(basePrice)
+            .maxPrice(maxPrice)
             .build();
         
         event.update();
         
-        assertThat(event.isOffline()).isTrue();
-        
-        event = Event.builder()
+        assertThat(event.isFree()).isEqualTo(isFree);
+    }
+    
+    private static Stream<Arguments> provideForTestOffline() {
+        return Stream.of(
+            Arguments.of("강남", true),
+            Arguments.of(null, false),
+            Arguments.of("", false)
+        );
+    }
+    
+    @ParameterizedTest
+    @MethodSource(value = "provideForTestOffline")
+    void testOffline(String location, boolean isOffline) {
+        Event event = Event.builder()
+            .location(location)
             .build();
         
         event.update();
         
-        assertThat(event.isOffline()).isFalse();
+        assertThat(event.isOffline()).isEqualTo(isOffline);
     }
 }
