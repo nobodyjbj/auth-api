@@ -17,6 +17,9 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
 
 logging:
   level:
