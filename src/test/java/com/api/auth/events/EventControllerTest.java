@@ -71,10 +71,15 @@ public class EventControllerTest extends BaseControllerTest {
         
         // when & then
         mockMvc.perform(post("/api/events/")
-            .contentType(MediaTypes.HAL_JSON_VALUE)
-            .accept(MediaTypes.HAL_JSON_VALUE)
-            .content(objectMapper.writeValueAsString(event)))
+                    .contentType(MediaTypes.HAL_JSON_VALUE)
+                    .accept(MediaTypes.HAL_JSON_VALUE)
+                    .content(objectMapper.writeValueAsString(event)))
             .andDo(print())
-            .andExpect(status().isCreated());
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$[0].objectName").exists())
+            .andExpect(jsonPath("$[0].field").exists())
+            .andExpect(jsonPath("$[0].defaultMessage").exists())
+            .andExpect(jsonPath("$[0].code").exists())
+            .andExpect(jsonPath("$[0].rejectedValue").exists());
     }
 }
