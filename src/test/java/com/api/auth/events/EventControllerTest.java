@@ -30,7 +30,7 @@ public class EventControllerTest extends BaseControllerTest {
                 .location("저 세상 강의실 A1")
                 .build();
         
-        // when & then
+        // when & then test
         mockMvc.perform(post("/api/events/")
                     .contentType(MediaTypes.HAL_JSON_VALUE)
                     .accept(MediaTypes.HAL_JSON_VALUE)
