@@ -2,16 +2,12 @@ package com.api.auth.events;
 
 import lombok.*;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
-@Builder @AllArgsConstructor @NoArgsConstructor
-@Getter @EqualsAndHashCode(of = "id")
-public class Event {
+@Getter @Setter
+@Builder @NoArgsConstructor @AllArgsConstructor
+public class EventDto {
     
-    @Id @GeneratedValue
-    private Integer id;
     private String name;
     private String description;
     private LocalDateTime beginEnrollmentDateTime;
@@ -22,8 +18,4 @@ public class Event {
     private int basePrice;
     private int maxPrice;
     private int limitOfEnrollment;
-    private boolean offline;
-    
-    @Enumerated(EnumType.STRING)
-    private EventStatus eventStatus = EventStatus.DRAFT;
 }
