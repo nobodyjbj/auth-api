@@ -4,7 +4,6 @@ import com.api.auth.common.BaseControllerTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
-import org.springframework.test.annotation.Rollback;
 
 import java.time.LocalDateTime;
 
@@ -43,6 +42,9 @@ public class EventControllerTest extends BaseControllerTest {
             .andExpect(jsonPath("free").value(false))
             .andExpect(jsonPath("offline").value(true))
             .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()))
+            .andExpect(jsonPath("_links.self").exists())
+            .andExpect(jsonPath("_links.query-events").exists())
+            .andExpect(jsonPath("_links.update-event").exists())
         ;
     }
     
@@ -55,7 +57,8 @@ public class EventControllerTest extends BaseControllerTest {
                     .accept(MediaTypes.HAL_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(eventDto)))
             .andDo(print())
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+        ;
     }
     
     @Test
@@ -82,9 +85,9 @@ public class EventControllerTest extends BaseControllerTest {
             .andDo(print())
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$[0].objectName").exists())
-            .andExpect(jsonPath("$[0].field").exists())
             .andExpect(jsonPath("$[0].defaultMessage").exists())
             .andExpect(jsonPath("$[0].code").exists())
-            .andExpect(jsonPath("$[0].rejectedValue").exists());
+            .andExpect(jsonPath("_links.index").exists())
+        ;
     }
 }

@@ -1,8 +1,10 @@
 package com.api.auth.events;
 
+import com.api.auth.commons.ErrorsResource;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,18 +29,31 @@ public class EventController {
     @PostMapping
     public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
         if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors);
+            return badRequest(errors);
         }
         
         eventValidator.validate(eventDto, errors);
         if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors);
+            return badRequest(errors);
         }
         
         Event event = modelMapper.map(eventDto, Event.class);
         event.update();
         Event newEvent = this.eventRepository.save(event);
-        URI createdUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
-        return ResponseEntity.created(createdUri).body(event);
+        URI createdUri = this.getLinkAddress().slash(newEvent.getId()).toUri();
+        
+        EventResource eventResource = new EventResource(event);
+        eventResource.add(linkTo(this.getClass()).withRel("query-events"));
+        eventResource.add(linkTo(this.getClass()).slash(event.getId()).withRel("update-event"));
+        
+        return ResponseEntity.created(createdUri).body(eventResource);
+    }
+    
+    private WebMvcLinkBuilder getLinkAddress() {
+        return linkTo(this.getClass());
+    }
+    
+    private ResponseEntity badRequest(Errors errors) {
+        return ResponseEntity.badRequest().body(new ErrorsResource(errors));
     }
 }
